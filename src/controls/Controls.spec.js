@@ -23,4 +23,8 @@ describe("<Controls />", () => {
     const closed = render(<Controls closed={true} />).getByTestId("doorbtn");
     expect(closed).toHaveTextContent(/open/i);
   });
+  test("lock button disabled when door open", () => {
+    const lock = render(<Controls closed={false} />).getByTestId("lockbtn");
+    expect(lock).toBeDisabled();
+  });
 });
