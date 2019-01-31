@@ -7,32 +7,110 @@ import { StateMock } from "@react-mock/state";
 
 import Dashboard from "./Dashboard";
 
-describe("<Dashboard />", () => {
-  test("clicking 'close' button changes state", () => {
-    //assumes initial state false/false
-    //try @react-mock/state
-    //from https://react-testing-examples.com/
-    const renderDashboard = ({ closed }) =>
-      render(
-        <StateMock state={{ closed }}>
-          <Dashboard />
-        </StateMock>
-      );
-    const doorButton = renderDashboard({ closed: false }).getByTestId(
-      "doorbtn"
+describe("<Dashboard />/Integration", () => {
+  //define render function for passing initial state
+  const renderDashboard = ({ closed, locked }) =>
+    render(
+      <StateMock state={{ closed, locked }}>
+        <Dashboard />
+      </StateMock>
     );
-    // const doorButton = render(<Dashboard />).getByTestId("doorbtn");
-    expect(doorButton).toHaveTextContent(/close/i);
-    fireEvent.click(doorButton);
-    expect(doorButton).toHaveTextContent(/open/i);
+  describe("button text changes appropriately", () => {
+    test("lock toggle", () => {
+      //setup
+      const initState = {
+        closed: true,
+        locked: false
+      };
+      //run SUT
+      const lockButton = renderDashboard(initState).getByTestId("lockbtn");
+      //assert
+      expect(lockButton).not.toHaveTextContent(/unlock/i);
+      fireEvent.click(lockButton);
+      expect(lockButton).toHaveTextContent(/unlock/i);
+      fireEvent.click(lockButton);
+      expect(lockButton).not.toHaveTextContent(/unlock/i);
+    });
+    test("door toggle", () => {
+      //setup
+      const initState = {
+        closed: true,
+        locked: false
+      };
+      //run SUT
+      const doorButton = renderDashboard(initState).getByTestId("doorbtn");
+      //assert
+      expect(doorButton).toHaveTextContent(/open/i);
+      fireEvent.click(doorButton);
+      expect(doorButton).toHaveTextContent(/close/i);
+      fireEvent.click(doorButton);
+      expect(doorButton).toHaveTextContent(/open/i);
+    });
   });
-  test("clicking 'close' on control changes display", () => {
-    //assumes initial state false/false
-    const { getByTestId } = render(<Dashboard />);
-    const button = getByTestId("doorbtn");
-    const display = getByTestId("door");
-    expect(display).toHaveTextContent(/open/i);
-    fireEvent.click(button);
-    expect(display).toHaveTextContent(/closed/i);
+  describe("display text changes from control inputs", () => {
+    test("door toggle", () => {
+      //setup
+      const initState = {
+        closed: false,
+        locked: false
+      };
+      //run SUT
+      const { getByTestId } = renderDashboard(initState);
+      const button = getByTestId("doorbtn");
+      const display = getByTestId("door");
+      //assert
+      expect(display).toHaveTextContent(/open/i);
+      fireEvent.click(button);
+      expect(display).toHaveTextContent(/closed/i);
+      fireEvent.click(button);
+      expect(display).toHaveTextContent(/open/i);
+    });
+    test("lock toggle", () => {
+      //setup
+      const initState = {
+        closed: true,
+        locked: false
+      };
+      //run SUT
+      const { getByTestId } = renderDashboard(initState);
+      const button = getByTestId("lockbtn");
+      const display = getByTestId("lock");
+      //assert
+      expect(display).toHaveTextContent(/unlocked/i);
+      fireEvent.click(button);
+      expect(display).not.toHaveTextContent(/unlocked/i);
+      fireEvent.click(button);
+      expect(display).toHaveTextContent(/unlocked/i);
+    });
+  });
+  describe("limits", () => {
+    test("cannot open locked door", () => {
+      //setup
+      const initState = {
+        closed: true,
+        locked: true
+      };
+      //run SUT
+      const { getByTestId } = renderDashboard(initState);
+      const button = getByTestId("doorbtn");
+      const display = getByTestId("door");
+      //assert
+      fireEvent.click(button);
+      expect(button).toHaveTextContent(/open/i);
+      expect(display).toHaveTextContent(/closed/i);
+    });
+    test("cannot lock opened door", () => {
+      const initState = {
+        closed: false,
+        locked: false
+      };
+
+      const { getByTestId } = renderDashboard(initState);
+      const button = getByTestId("lockbtn");
+      const display = getByTestId("lock");
+
+      fireEvent.click(button);
+      expect(display).toHaveTextContent(/unlocked/i);
+    });
   });
 });
