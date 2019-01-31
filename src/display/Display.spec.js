@@ -3,10 +3,23 @@ import React from "react";
 import { render } from "react-testing-library";
 import "react-testing-library/cleanup-after-each";
 import "jest-dom/extend-expect";
+import renderer from "react-test-renderer";
 
 import Display from "./display";
 
 describe("<Display />", () => {
+  test.skip("matches the snapshot", () => {
+    // first run creates snapshot in new folder in this directory
+    // when component changes from snapshot, test fails, gives option to update snapshot
+    const node = renderer.create(<Display />).toJSON();
+    expect(node).toMatchSnapshot();
+  });
+  test.skip("matches the snapshot with props", () => {
+    // first run creates snapshot in new folder in this directory
+    // when component changes from snapshot, test fails, gives option to update snapshot
+    const node = renderer.create(<Display closed={true} />).toJSON();
+    expect(node).toMatchSnapshot();
+  });
   test("displays closed if 'closed' prop is true", () => {
     const { getByText } = render(<Display closed={true} />);
     getByText(/closed/i);
@@ -15,8 +28,9 @@ describe("<Display />", () => {
     const checkOpen = render(<Display closed={false} />).getByText;
     //commented out below doesnt work, renders on top of each other, false positives, etc...
     // const checkClosed = render(<Display closed={true} />).getByText;
-
+    // could try { getByText, rerender } instead, but might as well separate tests
     checkOpen(/open/i);
+
     // checkClosed(/closed/i);
   });
   test("displays locked if 'locked' prop is true", () => {
