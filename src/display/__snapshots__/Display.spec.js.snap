@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Display /> matches the snapshot 1`] = `
+<div
+  className="display panel"
+>
+  <div
+    className="led green-led"
+    data-testid="lock"
+  >
+    Unlocked
+  </div>
+  <div
+    className="led green-led"
+    data-testid="door"
+  >
+    Open
+  </div>
+</div>
+`;
+
+exports[`<Display /> matches the snapshot with props 1`] = `
+<div
+  className="display panel"
+>
+  <div
+    className="led green-led"
+    data-testid="lock"
+  >
+    Unlocked
+  </div>
+  <div
+    className="led red-led"
+    data-testid="door"
+  >
+    Closed
+  </div>
+</div>
+`;
